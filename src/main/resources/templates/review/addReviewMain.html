@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Добавление отзыва</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <style>
+    body {
+        background: linear-gradient(135deg, #90a6a4, #123530);
+        font-family: 'Arial', sans-serif;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        overflow: auto;
+    }
+
+    .header {
+        background: rgba(48, 104, 96, 0.9);
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #d3ecec;
+        margin: 0;
+        animation: slideIn 1s ease-in-out;
+    }
+
+    .container {
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 1rem;
+        color: #d3ecec;
+        font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        border-color: #1a4a42;
+        background: rgba(255, 255, 255, 0.2);
+        outline: none;
+        box-shadow: 0 0 8px rgba(26, 74, 66, 0.5);
+    }
+
+    .form-group textarea {
+        height: 100px;
+        resize: none;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #123530, #1a4a42);
+        border: none;
+        border-radius: 10px;
+        padding: 12px 24px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #1a4a42, #123530);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 24px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+  </style>
+</head>
+<body>
+<div class="header">
+  <h1>Добавление отзыва</h1>
+</div>
+<div class="container">
+  <form th:action="@{/reviews/main}" th:object="${review}" method="post">
+    <!-- Скрытое поле для productID -->
+    <input type="hidden" th:field="*{productID}" />
+
+    <div class="form-group">
+      <label for="userid">ID пользователя:</label>
+      <input type="number" class="form-control" id="userid" th:field="*{userID}" required/>
+      <div th:if="${#fields.hasErrors('userID')}" class="text-danger">
+        <span th:errors="*{userID}"></span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="rating">Рейтинг:</label>
+      <select class="form-control" id="rating" th:field="*{rating}" required>
+        <option value="1">1 звезда</option>
+        <option value="2">2 звезды</option>
+        <option value="3">3 звезды</option>
+        <option value="4">4 звезды</option>
+        <option value="5">5 звезд</option>
+      </select>
+      <div th:if="${#fields.hasErrors('rating')}" class="text-danger">
+        <span th:errors="*{rating}"></span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="comment">Комментарий:</label>
+      <textarea class="form-control" id="comment" th:field="*{comment}" required></textarea>
+      <div th:if="${#fields.hasErrors('comment')}" class="text-danger">
+        <span th:errors="*{comment}"></span>
+      </div>
+    </div>
+    <div class="button-group">
+      <button type="submit" class="btn btn-success">Добавить</button>
+      <a href="/index" class="btn btn-secondary">Назад</a>
+    </div>
+  </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Детали заказа | Интернет-магазин электроники</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #90a6a4, #123530);
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: rgba(48, 104, 96, 0.9);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #d3ecec;
+            margin: 0;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .user-profile {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .user-icon {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-icon i {
+            font-size: 24px;
+            color: #d3ecec;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 70px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-dropdown.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .user-dropdown a {
+            display: block;
+            color: #d3ecec;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .user-dropdown a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-dropdown a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            color: #d3ecec;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+        .back-button i {
+            margin-right: 10px;
+        }
+
+        .order-details-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .order-title {
+            font-size: 1.8rem;
+            color: #d3ecec;
+            margin: 0;
+        }
+
+        .order-status {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .status-completed {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-processing {
+            background: rgba(0, 123, 255, 0.2);
+            color: #000000;
+        }
+
+        .status-cancelled {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .order-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .info-card h3 {
+            font-size: 1.2rem;
+            color: #d3ecec;
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #d3ecec;
+        }
+
+        .info-value {
+            color: #fff;
+        }
+
+        .order-items {
+            margin-bottom: 25px;
+        }
+
+        .order-items h3 {
+            font-size: 1.4rem;
+            color: #d3ecec;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .items-table th {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: #d3ecec;
+            font-weight: 600;
+        }
+
+        .items-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-name {
+            font-weight: bold;
+            color: #d3ecec;
+        }
+
+        .product-category {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .order-totals {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .totals-table {
+            width: 300px;
+            border-collapse: collapse;
+        }
+
+        .totals-table td {
+            padding: 8px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .totals-table tr:last-child td {
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #d3ecec;
+        }
+
+        .order-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #123530, #1a4a42);
+            color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1a4a42, #123530);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #d3ecec;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            color: #fff;
+        }
+
+        .btn-danger {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-danger:hover {
+            background: rgba(220, 53, 69, 0.3);
+            transform: translateY(-2px);
+            color: #ff6b6b;
+        }
+
+        .tracking-section {
+            margin-top: 30px;
+        }
+
+        .tracking-section h3 {
+            font-size: 1.4rem;
+            color: #d3ecec;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tracking-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .tracking-timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .timeline-item.active::before {
+            background: #1a4a42;
+            box-shadow: 0 0 0 3px rgba(26, 74, 66, 0.3);
+        }
+
+        .timeline-item.completed::before {
+            background: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
+        }
+
+        .timeline-date {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 5px;
+        }
+
+        .timeline-content {
+            color: #fff;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .order-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .order-actions {
+                flex-direction: column;
+            }
+
+            .items-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Интернет-магазин электроники</h1>
+</div>
+
+<div class="user-profile">
+    <div class="user-icon" onclick="toggleUserDropdown()">
+        <i class="fas fa-user"></i>
+    </div>
+    <div class="user-dropdown" id="userDropdown">
+        <a href="/profile"><i class="fas fa-user-circle"></i> Мой профиль</a>
+        <a href="/orders"><i class="fas fa-shopping-bag"></i> Мои заказы</a>
+        <a href="/reviews"><i class="fas fa-star"></i> Мои отзывы</a>
+        <a href="/settings"><i class="fas fa-cog"></i> Настройки</a>
+        <a href="/login" style="border-top: 1px solid rgba(255,255,255,0.2); margin-top: 10px; padding-top: 10px;">
+            <i class="fas fa-sign-out-alt"></i> Выйти
+        </a>
+    </div>
+</div>
+
+<div class="container">
+    <a href="/users/profile" class="back-button">
+        <i class="fas fa-arrow-left"></i> Назад к заказам
+    </a>
+
+    <div class="order-details-container">
+        <div class="order-header">
+            <h1 class="order-title" th:text="'Заказ #' + ${order.id}"></h1>
+            <span class="order-status" th:classappend="${order.status == 'completed' ? 'status-completed' : (order.status == 'pending' ? 'status-pending' : (order.status == 'cancelled' ? 'status-cancelled' : 'status-processing'))}"
+                  th:text="${order.status == 'completed' ? 'Завершен' : (order.status == 'pending' ? 'Ожидает оплаты' : (order.status == 'cancelled' ? 'Отменен' : 'В обработке'))}">
+        В обработке
+      </span>
+        </div>
+
+        <div class="order-info-grid">
+            <div class="info-card">
+                <h3>Информация о заказе</h3>
+                <div class="info-item">
+                    <span class="info-label">Дата заказа:</span>
+                    <span class="info-value" th:text="${order.orderDate}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Способ доставки:</span>
+                    <span class="info-value" th:text="${order.deliveryMethod}">Курьерская доставка</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Способ оплаты:</span>
+                    <span class="info-value" th:text="${order.paymentMethod}">Банковская карта</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Статус оплаты:</span>
+                    <span class="info-value" th:text="${order.status}">Оплачено</span>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h3>Информация о доставке</h3>
+                <div class="info-item">
+                    <span class="info-label">Получатель:</span>
+                    <span class="info-value" th:text="${user.surname}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Телефон:</span>
+                    <span class="info-value" th:text="${user.phone}"></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Адрес:</span>
+                    <span class="info-value" th:text="${user.address}"></span>
+                </div>
+<!--                <div class="info-item">-->
+<!--                    <span class="info-label">Ожидаемая дата доставки:</span>-->
+<!--                    <span class="info-value" th:text="${order.expectedDeliveryDate}">20.10.2023</span>-->
+<!--                </div>-->
+            </div>
+        </div>
+
+        <div class="order-items">
+            <h3>Товары в заказе</h3>
+            <table class="items-table">
+                <thead>
+                <tr>
+                    <th>Товар</th>
+                    <th class="text-center">Количество</th>
+                    <th class="text-right">Цена</th>
+                    <th class="text-right">Сумма</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${items}">
+                    <td>
+                        <div class="product-info">
+                            <div class="product-image">
+                                <img th:src="${item.fileurl}" alt="Изображение товара">
+                            </div>
+                            <div>
+                                <div class="product-name" th:text="${item.name}"></div>
+                                <div class="product-category" th:text="${item.category}"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-center" th:text="${item.quantity}">1</td>
+                    <td class="text-right" th:text="'$' + ${item.price}">$799</td>
+                    <td class="text-right" th:text="'$' + ${item.total}">$799</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="order-totals">
+                <table class="totals-table">
+                    <tr>
+                        <td>Стоимость товаров:</td>
+                        <td class="text-right" th:text="'$' + ${order.subtotal}">$1,598</td>
+                    </tr>
+                    <tr>
+                        <td>Доставка:</td>
+                        <td class="text-right" th:text="'$' + ${order.shippingCost}">$15</td>
+                    </tr>
+                    <tr>
+                        <td>Налог:</td>
+                        <td class="text-right" th:text="'$' + ${order.tax}">$120</td>
+                    </tr>
+                    <tr>
+                        <td>Итого:</td>
+                        <td class="text-right" th:text="'$' + ${order.totalPrice}">$1,733</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="tracking-section" th:if="${order.status != 'cancelled'}">
+            <h3>Отслеживание заказа</h3>
+            <div class="tracking-timeline">
+                <div class="timeline-item completed">
+                    <div class="timeline-date" th:text="${order.orderDate}">15.10.2023 14:30</div>
+                    <div class="timeline-content">Заказ оформлен</div>
+                </div>
+                <div class="timeline-item completed" th:if="${order.status != 'pending'}">
+                    <div class="timeline-date">16.10.2023 10:15</div>
+                    <div class="timeline-content">Заказ оплачен</div>
+                </div>
+                <div class="timeline-item active" th:if="${order.status == 'processing' || order.status == 'completed'}">
+                    <div class="timeline-date">17.10.2023 09:00</div>
+                    <div class="timeline-content">Заказ собран и готов к отправке</div>
+                </div>
+                <div class="timeline-item" th:if="${order.status == 'completed'}">
+                    <div class="timeline-date">19.10.2023 14:20</div>
+                    <div class="timeline-content">Заказ передан курьеру</div>
+                </div>
+                <div class="timeline-item" th:if="${order.status == 'completed'}">
+                    <div class="timeline-date" th:text="${order.deliveryDate}">20.10.2023 11:45</div>
+                    <div class="timeline-content">Заказ доставлен</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-actions">
+            <a th:href="@{/orders/print/{id}(id=${order.id})}" class="btn btn-secondary">
+                <i class="fas fa-print"></i> Распечатать заказ
+            </a>
+            <a th:href="@{/orders/invoice/{id}(id=${order.id})}" class="btn btn-secondary">
+                <i class="fas fa-file-invoice"></i> Скачать счет
+            </a>
+            <button class="btn btn-danger" th:if="${order.status == 'pending' || order.status == 'processing'}" onclick="cancelOrder()">
+                <i class="fas fa-times"></i> Отменить заказ
+            </button>
+            <button class="btn btn-primary" th:if="${order.status == 'completed'}" onclick="repeatOrder()">
+                <i class="fas fa-redo"></i> Повторить заказ
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Функция для переключения выпадающего меню пользователя
+    function toggleUserDropdown() {
+        const dropdown = document.getElementById('userDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    // Закрытие выпадающего меню при клике вне его
+    document.addEventListener('click', function(event) {
+        const userProfile = document.querySelector('.user-profile');
+        const dropdown = document.getElementById('userDropdown');
+        if (!userProfile.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+
+    // Функция для отмены заказа
+    function cancelOrder() {
+        if (confirm('Вы уверены, что хотите отменить этот заказ?')) {
+            // Здесь будет код для отправки запроса на отмену заказа
+            alert('Заказ отменен');
+            window.location.reload();
+        }
+    }
+
+    // Функция для повторения заказа
+    function repeatOrder() {
+        // Здесь будет код для повторения заказа
+        alert('Товары из заказа добавлены в корзину');
+        window.location.href = '/cart';
+    }
+</script>
+</body>
+</html>

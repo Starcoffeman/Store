@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Интернет-магазин электроники</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        #checkout-button {
+    background: linear-gradient(135deg, #123530, #1a4a42);
+    border: none;
+    border-radius: 10px;
+    padding: 15px 30px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+#checkout-form input,
+#checkout-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#checkout-form input:focus,
+#checkout-form textarea:focus {
+    border-color: #1a4a42;
+    background: rgba(255, 255, 255, 0.2);
+    outline: none;
+    box-shadow: 0 0 8px rgba(26, 74, 66, 0.5);
+}
+
+#checkout-form textarea {
+    height: 100px;
+    resize: none;
+}
+#checkout-form button {
+    background: linear-gradient(135deg, #123530, #1a4a42);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 24px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+#checkout-form button:hover {
+    background: linear-gradient(135deg, #1a4a42, #123530);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+#checkout-form button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+#checkout-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1rem;
+    color: #d3ecec;
+    font-weight: 500;
+}
+#checkout-button:hover {
+    background: linear-gradient(135deg, #1a4a42, #123530);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+#checkout-button:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+        body {
+            background: linear-gradient(135deg, #90a6a4, #123530);
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .header {
+            background: rgba(48, 104, 96, 0.9);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #d3ecec;
+            margin: 0;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 20px;
+            position: relative;
+        }
+
+        /* Стили для иконки пользователя */
+        .user-profile {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .user-icon {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-icon i {
+            font-size: 24px;
+            color: #d3ecec;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 70px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-dropdown.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .user-dropdown a {
+            display: block;
+            color: #d3ecec;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .user-dropdown a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-dropdown a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        #review-form {
+    margin-top: 20px;
+}
+
+    #review-form input,
+    #review-form textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+    }
+
+    #review-form textarea {
+        height: 100px;
+        resize: none;
+    }
+
+    #review-form button {
+        background: #123530;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    #review-form button:hover {
+        background: #1a4a42;
+    }
+
+    /* Стили для выбора рейтинга */
+    #review-rating {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        padding: 10px;
+        color: #fff;
+        font-size: 1rem;
+        width: 100%;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    #review-rating:focus {
+        border-color: #1a4a42;
+        background: rgba(255, 255, 255, 0.2);
+        outline: none;
+        box-shadow: 0 0 8px rgba(26, 74, 66, 0.5);
+    }
+
+    #review-rating option {
+        background: #123530;
+        color: #fff;
+    }/* Стили для выбора рейтинга */
+    #review-rating {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        padding: 10px;
+        color: #fff;
+        font-size: 1rem;
+        width: 100%;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+
+    #review-rating:focus {
+        border-color: #1a4a42;
+        background: rgba(255, 255, 255, 0.2);
+        outline: none;
+        box-shadow: 0 0 8px rgba(26, 74, 66, 0.5);
+    }
+
+    #review-rating option {
+        background: #123530;
+        color: #fff;
+    }
+        .products {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            flex: 3;
+            margin-top: 60px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            margin-top: 20px;
+            padding: 20px;
+            width: calc(33.333% - 20px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .product-card h3 {
+            font-size: 1.5rem;
+            color: #d3ecec;
+            margin-bottom: 10px;
+        }
+
+        .product-card p {
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .product-card .price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin: 0 0 15px 0;
+            color: #123530;
+            background: #d3ecec;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .product-card button {
+            background: #123530;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+        }
+
+        .product-card button:hover {
+            background: #1a4a42;
+        }
+
+        .cart {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            max-width: 300px;
+            margin-left: 20px;
+        }
+
+        .cart h2 {
+            font-size: 1.5rem;
+            color: #d3ecec;
+            margin-bottom: 15px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item button {
+            background: #ff6b6b;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .cart-item button:hover {
+            background: #ff4c4c;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s ease-in-out;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-header h2 {
+            font-size: 1.8rem;
+            color: #d3ecec;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .modal-header .close {
+            background: none;
+            border: none;
+            color: #d3ecec;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-header .close:hover {
+            color: #ff6b6b;
+        }
+
+        .modal-body {
+            display: flex;
+            gap: 20px;
+        }
+
+        .modal-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .modal-left img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .modal-left .price {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #123530;
+            background: #d3ecec;
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .modal-right {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-right p {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .modal-right .reviews {
+            margin-top: 20px;
+        }
+
+        .modal-right .reviews h3 {
+            font-size: 1.4rem;
+            color: #d3ecec;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .modal-right .review-item {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-right .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .modal-right .review-item h4 {
+            font-size: 1.1rem;
+            color: #d3ecec;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .modal-right .review-item p {
+            color: #fff;
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .average-rating {
+            font-size: 1rem;
+            color: #000000;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .sort-dropdown {
+            position: fixed;
+            top: 100px;
+            left: 10%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            width: 300px;
+            text-align: center;
+        }
+
+        .filter-dropdown {
+    position: fixed;
+    top: 100px;
+    left: 20%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 10px 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    width: 300px;
+    text-align: center;
+}
+
+.filter-dropdown select {
+    background: #123530;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    width: 100%;
+}
+
+.filter-dropdown select:hover {
+    background: #1a4a42;
+}
+
+        .sort-dropdown select {
+            background: #123530;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-primary {
+            margin-top: 10px;
+        }
+
+        .sort-dropdown select:hover {
+            background: #1a4a42;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Интернет-магазин электроники</h1>
+</div>
+
+<div class="user-profile">
+    <div class="user-icon" onclick="toggleUserDropdown()">
+        <i class="fas fa-user"></i>
+    </div>
+    <div class="user-dropdown" id="userDropdown">
+        <a href="/users/profile"><i class="fas fa-user-circle"></i> Мой профиль</a>
+        <a href="/orders"><i class="fas fa-shopping-bag"></i> Мои заказы</a>
+        <a href="/reviews"><i class="fas fa-star"></i> Мои отзывы</a>
+        <a href="/settings"><i class="fas fa-cog"></i> Настройки</a>
+        <a href="/login" style="border-top: 1px solid rgba(255,255,255,0.2); margin-top: 10px; padding-top: 10px;">
+            <i class="fas fa-sign-out-alt"></i> Выйти
+        </a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="sort-dropdown">
+        <select onchange="sortAndFilterProducts(this.value)">
+            <option value="">Сортировка и фильтр</option>
+            <option value="price_asc">По возрастанию цены</option>
+            <option value="price_desc">По убыванию цены</option>
+            <option value="rating_5">5 звезд</option>
+            <option value="rating_4">4 звезды и выше</option>
+            <option value="rating_3">3 звезды и выше</option>
+            <option value="rating_2">2 звезды и выше</option>
+            <option value="rating_1">1 звезда и выше</option>
+        </select>
+    </div>
+
+    <div class="products">
+        <div class="product-card" th:each="product : ${products}" th:data-id="${product.id}" th:data-name="${product.name}" th:data-price="${product.price}" onclick="openModal(this)">
+            <img th:src="${product.fileurl}" alt="Товар">
+            <h3 th:text="${product.name}"></h3>
+            <p th:text="${product.description}"></p>
+            <div class="price" th:text="|$${product.price}|"></div>
+            <div class="average-rating">
+                <span th:text="'Рейтинг: ' + ${product.averageRating != null ? product.averageRating : '0.0'} + ' из 5'"></span>
+            </div>
+            <button th:data-name="${product.name}" th:data-price="${product.price}" onclick="addToCart(this, event)">Добавить в корзину</button>
+            <a th:href="@{/reviews/main?productID={id}(id=${product.id})}" style="background-color: #1a4a42; border-color: #1a4a42;" class="btn btn-primary">Оставить отзыв</a>
+        </div>
+    </div>
+    <div class="cart">
+        <h2>Корзина</h2>
+        <div id="cart-items"></div>
+        <div id="cart-total">
+            <strong>Итого: $<span id="total-price">0.00</span></strong>
+        </div>
+        <button style="background-color: #1a4a42; border-color: #1a4a42;"
+                class="btn btn-primary"
+                id="checkout-button"
+                onclick="handleCheckout()">
+            Оформить заказ
+        </button>
+    </div>
+</div>
+
+
+<div th:each="product : ${products}" th:id="|product${product.id}|" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 th:text="${product.name}"></h2>
+            <button class="close" onclick="closeModal(this)">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-left">
+                <img th:src="${product.fileurl}" alt="Товар">
+                <div class="price" th:text="|$${product.price}|"></div>
+            </div>
+            <div class="modal-right">
+                <p th:text="${product.description}"></p>
+                <div class="reviews">
+                    <h3>Отзывы</h3>
+                    <div th:each="review : ${product.reviews}" th:id="|review${review.id}|">
+                        <div class="review-item">
+                            <h4 th:text="'Пользователь ' + ${review.userID}"></h4>
+                            <p th:text="'Рейтинг: ' + ${review.rating} + ' звезд(ы)'"></p>
+                            <p th:text="${review.comment}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let cart = [];
+    let totalPrice = 0;
+
+    // Функция для переключения выпадающего меню пользователя
+    function toggleUserDropdown() {
+        const dropdown = document.getElementById('userDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    // Закрытие выпадающего меню при клике вне его
+    document.addEventListener('click', function(event) {
+        const userProfile = document.querySelector('.user-profile');
+        const dropdown = document.getElementById('userDropdown');
+        if (!userProfile.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+
+    function handleCheckout() {
+        if (cart.length === 0) {
+            alert("Ваша корзина пуста!");
+            return;
+        }
+        alert("Заглушка: Заказ оформлен!");
+    }
+
+    function addToCart(button) {
+        event.stopPropagation();
+        const name = button.getAttribute('data-name');
+        const price = parseFloat(button.getAttribute('data-price'));
+        cart.push({ name, price });
+        totalPrice += price;
+        updateCart();
+    }
+
+    function updateCart() {
+        const cartItems = document.getElementById('cart-items');
+        const totalPriceElement = document.getElementById('total-price');
+        cartItems.innerHTML = '';
+        cart.forEach((item, index) => {
+            const cartItem = document.createElement('div');
+            cartItem.className = 'cart-item';
+            cartItem.innerHTML = `
+                <span>${item.name} - $${item.price.toFixed(2)}</span>
+                <button onclick="removeFromCart(${index})">Удалить</button>
+            `;
+            cartItems.appendChild(cartItem);
+        });
+        totalPriceElement.textContent = totalPrice.toFixed(2);
+    }
+
+    function removeFromCart(index) {
+        totalPrice -= cart[index].price;
+        cart.splice(index, 1);
+        updateCart();
+    }
+
+    function openModal(productCard) {
+        const modalId = 'product' + productCard.getAttribute('data-id');
+        const modal = document.getElementById(modalId);
+        modal.style.display = 'flex';
+    }
+
+    function closeModal(button) {
+        const modal = button.closest('.modal');
+        modal.style.display = 'none';
+    }
+
+    function sortAndFilterProducts(value) {
+        const productsContainer = document.querySelector('.products');
+        const productCards = Array.from(productsContainer.querySelectorAll('.product-card'));
+
+        if (value.startsWith('rating_')) {
+            const minRating = parseFloat(value.split('_')[1]);
+            productCards.forEach(card => {
+                const averageRatingText = card.querySelector('.average-rating span').textContent;
+                const averageRating = parseFloat(averageRatingText.match(/\d+\.\d+/)[0]); // Извлекаем рейтинг из текста
+
+                if (averageRating >= minRating) {
+                    card.style.display = 'block'; // Показываем товар
+                } else {
+                    card.style.display = 'none'; // Скрываем товар
+                }
+            });
+        } else {
+            productCards.forEach(card => card.style.display = 'block');
+        }
+
+        if (value === 'price_asc' || value === 'price_desc') {
+            productCards.sort((a, b) => {
+                const priceA = parseFloat(a.querySelector('.price').textContent.replace('$', ''));
+                const priceB = parseFloat(b.querySelector('.price').textContent.replace('$', ''));
+                return value === 'price_asc' ? priceA - priceB : priceB - priceA;
+            });
+
+            productsContainer.innerHTML = '';
+            productCards.forEach(card => productsContainer.appendChild(card));
+        }
+    }
+
+    function openCheckoutModal() {
+        if (cart.length === 0) {
+            alert("Ваша корзина пуста!");
+            return;
+        }
+        const modal = document.getElementById('checkout-modal');
+        modal.style.display = 'flex';
+    }
+
+    function closeCheckoutModal() {
+        const modal = document.getElementById('checkout-modal');
+        modal.style.display = 'none';
+    }
+
+    function redirectToCheckout() {
+        if (cart.length === 0) {
+            alert("Ваша корзина пуста!");
+            return;
+        }
+
+        const userID = 1;
+        window.location.href = `/orders/checkout?userID=${userID}&totalPrice=${totalPrice}`;
+    }
+
+    window.onclick = function (event) {
+        if (event.target.classList.contains('modal')) {
+            if (event.target.id === 'checkout-modal') {
+                closeCheckoutModal();
+            } else {
+                event.target.style.display = 'none';
+            }
+        }
+    };
+
+</script>
+</body>
+</html>

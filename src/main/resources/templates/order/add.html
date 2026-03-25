@@ -1,0 +1,510 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org" lang="ru">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Добавление заказа</title>-->
+<!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">-->
+<!--    <style>-->
+<!--        .container-fluid {-->
+<!--            flex: 1;-->
+<!--        }-->
+
+<!--        .blockquote {-->
+<!--            background-color: rgba(48, 104, 96, 0.9);-->
+<!--            color: #d3ecec;-->
+<!--            text-align: center;-->
+<!--            padding: 20px;-->
+<!--            margin: 0;-->
+<!--        }-->
+
+<!--        .catalog-title {-->
+<!--            background-color: transparent;-->
+<!--            color: #123530;-->
+<!--            text-align: center;-->
+<!--            padding: 10px;-->
+<!--            margin: 0;-->
+<!--        }-->
+
+<!--        .fin {-->
+<!--            background-color: #90a6a4;-->
+<!--        }-->
+
+<!--        .catalog-title a {-->
+<!--            color: #123530;-->
+<!--            text-decoration: none;-->
+<!--        }-->
+
+<!--        .catalog-title a:hover {-->
+<!--            text-decoration: underline;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div class="fin">-->
+<!--    <h2 class="catalog-title">Добавление заказа</h2>-->
+<!--</div>-->
+<!--<div class="container-fluid bg-image"-->
+<!--     style="background-color: #90a6a4; height: 100vh; overflow: auto">-->
+<!--    <form th:action="@{/orders/add}" th:object="${orderDto}" method="post">-->
+<!--        <div class="form-group">-->
+<!--            <label for="userID">Пользователь:</label>-->
+<!--            <select class="form-control" id="userID" th:field="*{userID}" required>-->
+<!--                <option value="">&#45;&#45; Выберите пользователя &#45;&#45;</option>-->
+<!--                <option th:each="user : ${listUsers}"-->
+<!--                        th:value="${user.id}"-->
+<!--                        th:text="${user.username + ' (' + user.email + ')'}">-->
+<!--                </option>-->
+<!--            </select>-->
+<!--            <div th:if="${#fields.hasErrors('userID')}" class="text-danger">-->
+<!--                <span th:errors="*{userID}"></span>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="form-group">-->
+<!--            <label for="status">Статус:</label>-->
+<!--            <input type="text" class="form-control" id="status" th:field="*{status}" required/>-->
+<!--        </div>-->
+<!--        <div class="form-group">-->
+<!--            <label for="totalPrice">Сумма:</label>-->
+<!--            <input type="number" class="form-control" id="totalPrice" th:field="*{totalPrice}" required/>-->
+<!--        </div>-->
+<!--        <div style="display: flex;justify-content:space-between;padding: 10px 0">-->
+<!--            <button type="submit" class="btn btn-success">Добавить</button>-->
+<!--            <a href="/orders" class="btn btn-secondary">Назад</a>-->
+<!--        </div>-->
+<!--    </form>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавление заказа</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .container-fluid {
+            flex: 1;
+        }
+
+        .blockquote {
+            background-color: rgba(48, 104, 96, 0.9);
+            color: #d3ecec;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .catalog-title {
+            background-color: transparent;
+            color: #123530;
+            text-align: center;
+            padding: 10px;
+            margin: 0;
+        }
+
+        .fin {
+            background-color: #90a6a4;
+        }
+
+        .catalog-title a {
+            color: #123530;
+            text-decoration: none;
+        }
+
+        .catalog-title a:hover {
+            text-decoration: underline;
+        }
+
+        .order-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .order-section h3 {
+            color: #123530;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #123530;
+            padding-bottom: 10px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .items-table th {
+            background-color: #123530;
+            color: #d3ecec;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #90a6a4;
+            vertical-align: middle;
+        }
+
+        .product-select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #90a6a4;
+            border-radius: 4px;
+        }
+
+        .quantity-input {
+            width: 80px;
+            padding: 8px;
+            border: 1px solid #90a6a4;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .price-display {
+            font-weight: bold;
+            color: #123530;
+        }
+
+        .total-price {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #123530;
+            text-align: right;
+            padding: 15px 0;
+        }
+
+        .btn-add-item {
+            background: #123530;
+            color: #d3ecec;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn-add-item:hover {
+            background: #1a4a42;
+        }
+
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .btn-remove:hover {
+            background: #c82333;
+        }
+
+        .empty-items {
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .form-control:focus {
+            border-color: #123530;
+            box-shadow: 0 0 0 0.2rem rgba(18, 53, 48, 0.25);
+        }
+    </style>
+</head>
+<body>
+<div class="fin">
+    <h2 class="catalog-title">Добавление заказа</h2>
+</div>
+<div class="container-fluid bg-image" style="background-color: #90a6a4; min-height: 100vh; padding: 20px;">
+    <form th:action="@{/orders/add}" th:object="${orderDto}" method="post" id="orderForm">
+
+        <div class="order-section">
+            <h3>Основная информация</h3>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="userID" class="form-label">Пользователь:</label>
+                        <select class="form-control" id="userID" th:field="*{userID}" required>
+                            <option value="">-- Выберите пользователя --</option>
+                            <option th:each="user : ${listUsers}"
+                                    th:value="${user.id}"
+                                    th:text="${user.username + ' (' + user.email + ')'}">
+                            </option>
+                        </select>
+                        <div th:if="${#fields.hasErrors('userID')}" class="text-danger">
+                            <span th:errors="*{userID}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="status" class="form-label">Статус:</label>
+                        <select class="form-control" id="status" th:field="*{status}" required>
+                            <option value="pending">Ожидает оплаты</option>
+                            <option value="processing">В обработке</option>
+                            <option value="completed">Завершен</option>
+                            <option value="cancelled">Отменен</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="paymentMethod" class="form-label">Вариант оплаты:</label>
+                        <select class="form-control" id="paymentMethod" th:field="*{paymentMethod}" required>
+                            <option value="По карте">По карте</option>
+                            <option value="Наличными">Наличными</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label for="deliveryMethod" class="form-label">Вариант доставки:</label>
+                        <select class="form-control" id="deliveryMethod" th:field="*{deliveryMethod}" required>
+                            <option value="В постомат">В постомат</option>
+                            <option value="По адресу">По адресу</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-section">
+            <h3>Товары в заказе</h3>
+            <div id="itemsContainer">
+                <table class="items-table" id="itemsTable">
+                    <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Количество</th>
+                        <th>Цена за единицу</th>
+                        <th>Общая стоимость</th>
+                        <th>Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                    <!-- Строки будут добавляться динамически -->
+                    </tbody>
+                </table>
+
+                <div id="emptyMessage" class="empty-items">
+                    <i class="fas fa-shopping-cart fa-2x mb-3"></i>
+                    <p>Нет товаров в заказе. Добавьте товары с помощью формы ниже.</p>
+                </div>
+            </div>
+
+            <!-- Форма добавления нового товара -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Добавить товар</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group mb-3">
+                                <label for="productSelect" class="form-label">Товар:</label>
+                                <select class="form-control product-select" id="productSelect">
+                                    <option value="">-- Выберите товар --</option>
+                                    <option th:each="product : ${listProducts}"
+                                            th:value="${product.id}"
+                                            th:data-price="${product.price}"
+                                            th:text="${product.name + ' ($' + product.price + ')'}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label for="quantityInput" class="form-label">Количество:</label>
+                                <input type="number" class="form-control quantity-input" id="quantityInput" value="1" min="1">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Цена:</label>
+                                <div class="price-display" id="priceDisplay">$0.00</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-add-item w-100" onclick="addItem()">
+                                <i class="fas fa-plus"></i> Добавить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Итоговая сумма -->
+            <div class="total-price">
+                Итоговая сумма: <span id="totalPriceDisplay">$0.00</span>
+            </div>
+            <input type="hidden" id="totalPrice" th:field="*{totalPrice}">
+            <input type="hidden" id="orderItems" name="orderItems">
+        </div>
+
+        <!-- Кнопки действий -->
+        <div class="d-flex justify-content-between pt-3">
+            <button type="submit" class="btn btn-success btn-lg">
+                <i class="fas fa-save"></i> Создать заказ
+            </button>
+            <a href="/orders" class="btn btn-secondary btn-lg">
+                <i class="fas fa-arrow-left"></i> Назад к списку
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    let items = [];
+    let itemCounter = 0;
+
+    // Обновление отображения цены при выборе товара
+    document.getElementById('productSelect').addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        const price = selectedOption.getAttribute('data-price') || '0';
+        document.getElementById('priceDisplay').textContent = '$' + parseFloat(price).toFixed(2);
+    });
+
+    // Добавление товара в заказ
+    function addItem() {
+        const productSelect = document.getElementById('productSelect');
+        const quantityInput = document.getElementById('quantityInput');
+
+        const productId = productSelect.value;
+        const productName = productSelect.options[productSelect.selectedIndex].text;
+        const price = parseFloat(productSelect.options[productSelect.selectedIndex].getAttribute('data-price'));
+        const quantity = parseInt(quantityInput.value);
+
+        if (!productId) {
+            alert('Пожалуйста, выберите товар');
+            return;
+        }
+
+        if (quantity < 1) {
+            alert('Количество должно быть больше 0');
+            return;
+        }
+
+        // Проверяем, не добавлен ли уже этот товар
+        const existingItemIndex = items.findIndex(item => item.productId === productId);
+        if (existingItemIndex > -1) {
+            // Обновляем количество существующего товара
+            items[existingItemIndex].quantity += quantity;
+            updateItemsTable();
+        } else {
+            // Добавляем новый товар
+            const item = {
+                id: itemCounter++,
+                productId: productId,
+                productName: productName,
+                price: price,
+                quantity: quantity,
+                total: price * quantity
+            };
+            items.push(item);
+            updateItemsTable();
+        }
+
+        // Сбрасываем форму
+        productSelect.value = '';
+        quantityInput.value = '1';
+        document.getElementById('priceDisplay').textContent = '$0.00';
+    }
+
+    // Удаление товара из заказа
+    function removeItem(itemId) {
+        items = items.filter(item => item.id !== itemId);
+        updateItemsTable();
+    }
+
+    // Обновление количества товара
+    function updateQuantity(itemId, newQuantity) {
+        const item = items.find(item => item.id === itemId);
+        if (item && newQuantity > 0) {
+            item.quantity = parseInt(newQuantity);
+            item.total = item.price * item.quantity;
+            updateItemsTable();
+        }
+    }
+
+    // Обновление таблицы товаров
+    function updateItemsTable() {
+        const tableBody = document.getElementById('itemsTableBody');
+        const emptyMessage = document.getElementById('emptyMessage');
+        const table = document.getElementById('itemsTable');
+
+        tableBody.innerHTML = '';
+
+        if (items.length === 0) {
+            table.style.display = 'none';
+            emptyMessage.style.display = 'block';
+        } else {
+            table.style.display = 'table';
+            emptyMessage.style.display = 'none';
+
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.productName}</td>
+                    <td>
+                        <input type="number" class="quantity-input"
+                               value="${item.quantity}" min="1"
+                               onchange="updateQuantity(${item.id}, this.value)">
+                    </td>
+                    <td>$${item.price.toFixed(2)}</td>
+                    <td>$${item.total.toFixed(2)}</td>
+                    <td>
+                        <button type="button" class="btn-remove" onclick="removeItem(${item.id})">
+                            <i class="fas fa-trash"></i> Удалить
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        updateTotalPrice();
+        updateHiddenFields();
+    }
+
+    // Обновление общей суммы
+    function updateTotalPrice() {
+        const total = items.reduce((sum, item) => sum + item.total, 0);
+        document.getElementById('totalPriceDisplay').textContent = '$' + total.toFixed(2);
+        document.getElementById('totalPrice').value = total.toFixed(2);
+    }
+
+    // Обновление скрытых полей для отправки формы
+    function updateHiddenFields() {
+        const orderItems = items.map(item => ({
+            productID: item.productId,
+            quantity: item.quantity
+        }));
+        document.getElementById('orderItems').value = JSON.stringify(orderItems);
+    }
+
+    // Обработка отправки формы
+    document.getElementById('orderForm').addEventListener('submit', function(event) {
+        if (items.length === 0) {
+            event.preventDefault();
+            alert('Добавьте хотя бы один товар в заказ');
+            return;
+        }
+
+        updateHiddenFields();
+    });
+
+    // Инициализация
+    document.addEventListener('DOMContentLoaded', function() {
+        updateItemsTable();
+    });
+</script>
+</body>
+</html>
